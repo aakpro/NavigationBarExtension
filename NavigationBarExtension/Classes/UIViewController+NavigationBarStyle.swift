@@ -12,7 +12,7 @@ extension UIViewController {
     
     public struct DefaultValue {
         public static var navigationBarBackgroundAlpha: CGFloat = 1.0
-        public static var navigationBarBackgroundTintColor: UIColor? = nil
+        public static var navigationBarBackgroundTintColor: UIColor? = UINavigationBar().barTintColor
         public static var navigationBarTintColor: UIColor? = nil
         public static var navigationBarTitleTextAttributes: [NSAttributedString.Key : Any]? = nil
         public static var navigationBarBackgroundImage: UIImage? = nil
