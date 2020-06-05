@@ -60,7 +60,7 @@ extension UIViewController {
                if let color = objc_getAssociatedObject(self, &NavigationBarAssociatedKeys.navigationBarBackgroundTintColor) as? UIColor {
                    return color
                } else {
-                   return DefaultValue.navigationBarTintColor
+                   return DefaultValue.navigationBarBackgroundTintColor
                }
            }
            set {
