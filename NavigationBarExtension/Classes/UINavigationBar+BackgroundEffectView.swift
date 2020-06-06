@@ -12,7 +12,9 @@ extension UINavigationBar {
     
     fileprivate var backgroundEffectView: UIView? {
         
-        if #available(iOS 10.0, *) {
+        if #available(iOS 13, *) {
+            return backgroundView?.subviews.filter( { $0 is UIVisualEffectView }).first
+        }else if #available(iOS 10.0, *) {
             return backgroundView?.value(forKey: "_backgroundEffectView") as? UIView
         } else {
             return backgroundView?.value(forKeyPath: "_adaptiveBackdrop._backdropEffectView") as? UIView
@@ -20,7 +22,14 @@ extension UINavigationBar {
     }
     
     fileprivate var shadowView: UIView? {
-        return backgroundView?.value(forKey: "_shadowView") as? UIView
+        
+        guard let backgroundView = backgroundView else { return nil }
+        
+        guard #available(iOS 13, *) else {
+            return backgroundView.value(forKey: "_shadowView") as? UIView
+        }
+        
+        return backgroundView.subviews.first
     }
     
     fileprivate var backgroundView: UIView? {

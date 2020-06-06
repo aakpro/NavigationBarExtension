@@ -12,14 +12,16 @@ extension UIViewController {
     
     public struct DefaultValue {
         public static var navigationBarBackgroundAlpha: CGFloat = 1.0
+        public static var navigationBarBackgroundTintColor: UIColor? = UINavigationBar().barTintColor
         public static var navigationBarTintColor: UIColor? = nil
-        public static var navigationBarTitleTextAttributes: [NSAttributedStringKey : Any]? = nil
+        public static var navigationBarTitleTextAttributes: [NSAttributedString.Key : Any]? = nil
         public static var navigationBarBackgroundImage: UIImage? = nil
         public static var navigationBarShadowImageHidden: Bool = false
     }
     
     fileprivate struct NavigationBarAssociatedKeys {
         static var navigationBarBackgroundAlpha = "navigationBarBackgroundAlpha"
+        static var navigationBarBackgroundTintColor = "navigationBarBackgroundTintColor"
         static var navigationBarTintColor = "navigationBarTintColor"
         static var navigationBarTitleTextAttributes = "navigationBarTitleTextAttributes"
         static var navigationBarBackgroundImage = "navigationBarBackgroundImage"
@@ -53,9 +55,23 @@ extension UIViewController {
         }
     }
     
-    public var navigationBarTitleTextAttributes: [NSAttributedStringKey : Any]? {
+    public var navigationBarBackgroundTintColor: UIColor? {
+           get {
+               if let color = objc_getAssociatedObject(self, &NavigationBarAssociatedKeys.navigationBarBackgroundTintColor) as? UIColor {
+                   return color
+               } else {
+                   return DefaultValue.navigationBarBackgroundTintColor
+               }
+           }
+           set {
+               navigationController?.navigationBar.barTintColor = newValue
+               objc_setAssociatedObject(self, &NavigationBarAssociatedKeys.navigationBarBackgroundTintColor, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+           }
+       }
+    
+    public var navigationBarTitleTextAttributes: [NSAttributedString.Key : Any]? {
         get {
-            if let attributes = objc_getAssociatedObject(self, &NavigationBarAssociatedKeys.navigationBarTitleTextAttributes) as? [NSAttributedStringKey : Any] {
+            if let attributes = objc_getAssociatedObject(self, &NavigationBarAssociatedKeys.navigationBarTitleTextAttributes) as? [NSAttributedString.Key : Any] {
                 return attributes
             }else {
                 return DefaultValue.navigationBarTitleTextAttributes

@@ -15,7 +15,7 @@ extension UINavigationController {
     
     open override func viewDidLoad() {
         super.viewDidLoad()
-        interactivePopGestureRecognizer?.addTarget(self, action: #selector(action))
+        interactivePopGestureRecognizer?.addTarget(self, action: #selector(action(sender:)))
     }
     
     open class func swizzle() {
@@ -43,7 +43,7 @@ extension UINavigationController {
         }
     }
     
-    @objc fileprivate func action(_ sender: UIScreenEdgePanGestureRecognizer) {
+    @objc fileprivate func action(sender: UIScreenEdgePanGestureRecognizer) {
         
         // UIGestureRecognizerState 的状态转变参考 https://developer.apple.com/reference/appkit/nsgesturerecognizer
         
@@ -82,10 +82,20 @@ extension UINavigationController {
             let nowAlpha = average(fromAlpha, to: toAlpha, percent: coor.percentComplete)
             navigationBar.setBackgroundAlpha(nowAlpha)
             
-            let fromTintColor = fromVC.navigationBarTintColor ?? UIViewController.DefaultValue.navigationBarTintColor
-            let toTintColor = toVC.navigationBarTintColor ?? UIViewController.DefaultValue.navigationBarTintColor
-            let nowTintColor = averageColor(fromTintColor ?? .defaultNavigationBarTintColor, toColor: toTintColor ?? .defaultNavigationBarTintColor, percent: coor.percentComplete)
+            var fromTintColor = fromVC.navigationBarTintColor ?? UIViewController.DefaultValue.navigationBarTintColor
+            var toTintColor = toVC.navigationBarTintColor ?? UIViewController.DefaultValue.navigationBarTintColor
+            var nowTintColor = averageColor(fromTintColor ?? .defaultNavigationBarTintColor,
+                                            toColor: toTintColor ?? .defaultNavigationBarTintColor,
+                                            percent: coor.percentComplete)
             navigationBar.tintColor = nowTintColor
+            
+            fromTintColor = fromVC.navigationBarBackgroundTintColor ?? UIViewController.DefaultValue.navigationBarBackgroundTintColor
+            toTintColor = toVC.navigationBarBackgroundTintColor ?? UIViewController.DefaultValue.navigationBarBackgroundTintColor
+            nowTintColor = averageColor(fromTintColor ?? .defaultNavigationBarTintColor,
+                                        toColor: toTintColor ?? .defaultNavigationBarTintColor,
+                                        percent: coor.percentComplete)
+            
+            navigationBar.barTintColor = nowTintColor
             
         case .ended, .cancelled:
             
@@ -136,7 +146,10 @@ extension UINavigationController: UINavigationBarDelegate {
         let n = viewControllers.count >= itemCount ? 2 : 1
         let popToVC = viewControllers[viewControllers.count - n]
         navigationBar.update(with: popToVC)
-        popToViewController(popToVC, animated: true)
+        if #available(iOS 13, *) {}
+        else {
+            popToViewController(popToVC, animated: true)
+        }
         return true
     }
     
@@ -154,10 +167,12 @@ extension UINavigationBar {
     fileprivate func update(with viewController : UIViewController) {
         setBackgroundAlpha(viewController.navigationBarBackgroundAlpha)
         tintColor = viewController.navigationBarTintColor
+        barTintColor = viewController.navigationBarBackgroundTintColor
         titleTextAttributes = viewController.navigationBarTitleTextAttributes
         setBackgroundImage(viewController.navigationBarBackgroundImage, for: .default)
         viewController.setNeedsStatusBarAppearanceUpdate()
         hideShadowImage(viewController.navigationBarShadowImageHidden)
+        setNeedsLayout()
     }
 }
 
